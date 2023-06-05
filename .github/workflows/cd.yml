@@ -27,4 +27,4 @@ jobs:
         with:
           push: true
           tags: tsmc/controller:latest,tsmc/controller:${{ env.TAG }}
-          file: src/apps/controller/Dockerfile
+          file: apps/controller/Dockerfile
