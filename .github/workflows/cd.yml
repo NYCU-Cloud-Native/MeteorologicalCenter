@@ -10,12 +10,9 @@ jobs:
   docker:
     runs-on: ubuntu-latest
     name: "Build Docker image and push to Harbor"
+    env:
+      TAG: ${{ github.ref.name }}
     steps:
-      - name: Get version string
-        id: get-version
-        run: |
-          tag=${{ github.event.push.tag_name }}
-          echo "::set-output name=version::${tag:1}"
       - uses: actions/checkout@v3
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
@@ -29,5 +26,5 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: tsmc/controller:latest,tsmc/controller:${{ steps.get-version.outputs.version }}
+          tags: tsmc/controller:latest,tsmc/controller:${{ env.TAG }}
           file: src/apps/controller/Dockerfile
