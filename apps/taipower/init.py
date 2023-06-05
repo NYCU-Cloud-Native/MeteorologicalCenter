@@ -4,7 +4,7 @@ from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
 
 load_dotenv()
-# InfluxDB v2 connection details
+
 url = os.getenv('DB_URL')
 token = os.getenv('DB_TOKEN')
 org = os.getenv('DB_ORG')
@@ -18,11 +18,8 @@ write_api = client.write_api(write_options=SYNCHRONOUS)
 
 # Open the CSV file
 with open('001.csv', 'r') as f:
-    # reader = f.read().split('\r\n')[1:].split(',')
     reader = f.read().split('\n')[1:-1]
-    # Skip the header line
-    # next(reader)
-    # Process each row and write data to InfluxDB
+
     for row in reader:
         row = row.split(',')
         timestamp = row[0]
@@ -39,14 +36,12 @@ with open('001.csv', 'r') as f:
         
         for value in values:
             point = Point("power_measurement")
-            # point.tag("location", value)
             point.tag("location", value)
             point.field("_value", float(values[value]))
             point.time(datetime.strptime(timestamp, "%Y-%m-%d %H:%M").isoformat())
             
             write_api.write(bucket=bucket, org=org, record=[point])
 
-        # Write the data point to InfluxDB
 
 # Close the InfluxDB client
 client.close()

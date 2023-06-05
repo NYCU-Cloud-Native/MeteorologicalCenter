@@ -2,41 +2,58 @@ import grpc
 from concurrent import futures
 import power_data_pb2
 import power_data_pb2_grpc
-import pandas as pd
-from influxdb import InfluxDBClient
+import requests
+from datetime import datetime
+from dotenv import load_dotenv
+from influxdb_client import InfluxDBClient, Point, WritePrecision
+from influxdb_client.client.write_api import SYNCHRONOUS
+import os
 
 class PowerDataServicer(power_data_pb2_grpc.PowerDataServiceServicer):
     def GetPowerDataInfo(self, request, context):
-        csv_url = 'https://data.taipower.com.tw/opendata/apply/file/d006019/001.csv'
+        load_dotenv()
 
-        # Read the CSV file
-        df = pd.read_csv(csv_url)
+        url = os.getenv('DB_URL')
+        token = os.getenv('DB_TOKEN')
+        org = os.getenv('DB_ORG')
+        bucket = os.getenv('DB_BUCKET')
 
-        # Prepare the response
-        response = power_data_pb2.PowerDataResponse()
-        response.csvUrl = csv_url
+        # Create InfluxDB client
+        client = InfluxDBClient(url=url, token=token, org=org)
 
-        # Insert data to InfluxDB
-        influx_host = 'localhost'  # Update with your InfluxDB host
-        influx_port = 8086  # Update with your InfluxDB port
-        influx_database = 'your_database'  # Update with your InfluxDB database name
-        influx_measurement = 'power_data'  # Update with your desired measurement name
+        # Create the write API
+        write_api = client.write_api(write_options=SYNCHRONOUS)
 
-        client = InfluxDBClient(host=influx_host, port=influx_port)
-        client.create_database(influx_database)
-        client.switch_database(influx_database)
+        # Fetch data from URL
+        response = requests.get(url)
 
-        lines = []
-        for _, row in df.iterrows():
-            for column in df.columns:
-                lines.append(f'{column} value={row[column]}')
+        if response.status_code == 200:    
+            reader = response.text.split('\n')[1:-1]
 
-        influx_data = [{'measurement': influx_measurement, 'fields': {'value': line}} for line in lines]
-        client.write_points(influx_data)
+            for row in reader:
+                row = row.split(',')
+                timestamp = row[0]
+                locations = ['North Generate', 'North Consumption', 'Central Generate', 'Central Consumption', 'South Generate', 'South Consumption', 'East Generate', 'East Consumption']
+                values = {}
 
-        client.close()
+                for i, loc in enumerate(locations):
+                    values.update({
+                        loc: row[i+1]
+                    })
 
-        return response
+                # Create a data point        
+                for value in values:
+                    point = Point("power_measurement")
+                    point.tag("location", value)
+                    point.field("_value", float(values[value]))
+                    point.time(datetime.strptime(timestamp, "%Y-%m-%d %H:%M").isoformat())
+                    
+                    write_api.write(bucket=bucket, org=org, record=[point])
+
+                # Close the InfluxDB client
+                client.close()
+
+                return response
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
