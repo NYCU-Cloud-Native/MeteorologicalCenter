@@ -26,5 +26,5 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: tsmc/controller:latest,tsmc/controller:${{ env.TAG }}
+          tags: harbor.tsmc.n0b.me/tsmc/controller:latest,harbor.tsmc.n0b.me/tsmc/controller:${{ env.TAG }}
           file: apps/controller/Dockerfile
