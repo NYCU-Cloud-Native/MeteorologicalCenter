@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package powerdata;
+
+service PowerDataService {
+    rpc GetPowerDataInfo (PowerDataRequest) returns (PowerDataResponse) {}
+}
+
+message PowerDataRequest {
+    // Define any request message fields, if needed
+}
+
+message PowerDataResponse {
+    string csvUrl = 1;
+    // Include additional fields, if needed
+}
