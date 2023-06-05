@@ -2,10 +2,10 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
-import power_data_pb2 as power__data__pb2
+import crawler_pb2 as crawler__pb2
 
 
-class PowerDataServiceStub(object):
+class CrawlerStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -14,42 +14,42 @@ class PowerDataServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.GetPowerDataInfo = channel.unary_unary(
-                '/powerdata.PowerDataService/GetPowerDataInfo',
-                request_serializer=power__data__pb2.PowerDataRequest.SerializeToString,
-                response_deserializer=power__data__pb2.PowerDataResponse.FromString,
+        self.Run = channel.unary_unary(
+                '/crawler.Crawler/Run',
+                request_serializer=crawler__pb2.Request.SerializeToString,
+                response_deserializer=crawler__pb2.Response.FromString,
                 )
 
 
-class PowerDataServiceServicer(object):
+class CrawlerServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def GetPowerDataInfo(self, request, context):
+    def Run(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_PowerDataServiceServicer_to_server(servicer, server):
+def add_CrawlerServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'GetPowerDataInfo': grpc.unary_unary_rpc_method_handler(
-                    servicer.GetPowerDataInfo,
-                    request_deserializer=power__data__pb2.PowerDataRequest.FromString,
-                    response_serializer=power__data__pb2.PowerDataResponse.SerializeToString,
+            'Run': grpc.unary_unary_rpc_method_handler(
+                    servicer.Run,
+                    request_deserializer=crawler__pb2.Request.FromString,
+                    response_serializer=crawler__pb2.Response.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'powerdata.PowerDataService', rpc_method_handlers)
+            'crawler.Crawler', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
 
 
  # This class is part of an EXPERIMENTAL API.
-class PowerDataService(object):
+class Crawler(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def GetPowerDataInfo(request,
+    def Run(request,
             target,
             options=(),
             channel_credentials=None,
@@ -59,8 +59,8 @@ class PowerDataService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/powerdata.PowerDataService/GetPowerDataInfo',
-            power__data__pb2.PowerDataRequest.SerializeToString,
-            power__data__pb2.PowerDataResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/crawler.Crawler/Run',
+            crawler__pb2.Request.SerializeToString,
+            crawler__pb2.Response.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
