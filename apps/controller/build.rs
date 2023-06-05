@@ -1,3 +1,5 @@
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    Ok(())
+fn main() {
+    tonic_build::configure()
+        .compile(&["proto/crawler.proto"], &["proto"])
+        .unwrap();
 }
