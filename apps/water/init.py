@@ -13,6 +13,7 @@ org = os.getenv('DB_ORG')
 bucket = os.getenv('DB_BUCKET')
 data_url = os.getenv('DATA_URL')
 
+print(url, token, org, bucket, data_url)
 # Connect to InfluxDB
 client = InfluxDBClient(url=url, token=token, org=org)
 

@@ -7,7 +7,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
-import os
+import os, csv
 
 class CrawlerServicer(crawler_pb2_grpc.CrawlerServicer):
     def Run(self, request, context):
