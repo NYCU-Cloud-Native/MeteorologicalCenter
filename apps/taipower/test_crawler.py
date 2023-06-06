@@ -21,6 +21,7 @@ mock_env_data = {
     'DATA_URL': os.getenv('TEST_DATA_URL')
 }
 
+
 class MockCrawlerServicer(crawler_pb2_grpc.CrawlerServicer):
     def Run(self, request, context):
         # Mock the environment variables
@@ -78,6 +79,8 @@ class MockCrawlerServicer(crawler_pb2_grpc.CrawlerServicer):
         assert isinstance(response, crawler_pb2.Response)
 
 # Pytest function to test the gRPC server
+
+
 def test_grpc_server():
     # Start the gRPC server in a separate thread
     server_thread = threading.Thread(target=serve)
@@ -96,7 +99,3 @@ def test_grpc_server():
     # Stop the gRPC server
     channel.close()
     server_thread.join()
-
-# Run the pytest
-if __name__ == '__main__':
-    pytest.main(['-v'])

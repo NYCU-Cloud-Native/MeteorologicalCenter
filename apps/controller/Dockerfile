@@ -14,4 +14,6 @@ WORKDIR /app
 
 COPY --from=Build /app/target/release/controller /app
 
+EXPOSE 3000
+
 CMD ["./controller"]
