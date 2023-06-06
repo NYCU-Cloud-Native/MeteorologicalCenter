@@ -1,6 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { Earthquake } from './entites/earthquake.entity';
-import { InfluxDB } from 'influx';
 import { InfluxService } from '../influx/influx.service';
 import { Point } from '@influxdata/influxdb-client';
 
@@ -18,9 +16,7 @@ export class EarthquakeService {
       .floatField('MagnitudeValue', MagnitudeValue)
       .timestamp(OriginTime);
 
-    await this.influxService.writeRecord(
-      point,
-    );
+    await this.influxService.writeRecord(point);
 
     return;
   }

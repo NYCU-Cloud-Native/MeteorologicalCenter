@@ -6,10 +6,13 @@ describe('InfluxService', () => {
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [InfluxService, {
-        provide: "INFLUXDB_CLIENT_TOKEN",
-        useValue: {}
-      }],
+      providers: [
+        InfluxService,
+        {
+          provide: 'INFLUXDB_CLIENT_TOKEN',
+          useValue: {},
+        },
+      ],
     }).compile();
 
     service = module.get<InfluxService>(InfluxService);

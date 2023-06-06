@@ -1,14 +1,8 @@
-import { Controller, Get, Inject, OnModuleInit, Param } from '@nestjs/common';
-import { GrpcMethod, GrpcStreamMethod } from '@nestjs/microservices';
-import { Observable } from 'rxjs';
-import { HttpService, HttpModule } from '@nestjs/axios';
-import { Earthquake } from './entites/earthquake.entity';
+import { Controller } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
+import { HttpService } from '@nestjs/axios';
 import { EarthquakeService } from '../earthquake/earthquake.service';
 import { firstValueFrom } from 'rxjs';
-
-// interface EarthquakeService {
-//   createEarthquake(data: Earthquake): Observable<Earthquake>;
-// }
 
 @Controller()
 export class EarthquakeController {
@@ -25,7 +19,7 @@ export class EarthquakeController {
       ),
     );
 
-    const earthquake = await this.earthquakeService.createEarthquake(
+    await this.earthquakeService.createEarthquake(
       data.records.Earthquake[0].EarthquakeInfo.Epicenter.Location,
       data.records.Earthquake[0].EarthquakeInfo.EarthquakeMagnitude
         .MagnitudeValue,
