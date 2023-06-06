@@ -63,7 +63,8 @@ class ReservoirDataTestCase(unittest.TestCase):
         query = f'from(bucket: "{self.bucket}") |> range(start: -1m) |> filter(fn: (r) => r._measurement == "{measurement}")'
         tables = self.client.query_api().query(query, self.org)
         
-        pass
+        # Close the InfluxDB client
+        self.client.close()
 
 
     def tearDown(self):
