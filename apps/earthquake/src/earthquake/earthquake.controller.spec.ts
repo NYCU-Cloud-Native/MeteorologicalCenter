@@ -10,14 +10,17 @@ describe('EarthquakeController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [EarthquakeController],
-      providers: [EarthquakeService, {
-        provide: InfluxService,
-        useValue: {}
-      },
-    {
-      provide: HttpService,
-      useValue: {}
-    }],
+      providers: [
+        EarthquakeService,
+        {
+          provide: InfluxService,
+          useValue: {},
+        },
+        {
+          provide: HttpService,
+          useValue: {},
+        },
+      ],
     }).compile();
 
     controller = module.get<EarthquakeController>(EarthquakeController);

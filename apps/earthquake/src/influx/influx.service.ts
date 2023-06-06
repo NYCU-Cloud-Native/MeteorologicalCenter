@@ -1,6 +1,4 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IPoint } from 'influx';
-import { INFLUXDB_CLIENT_TOKEN, InfluxModule } from './influx.module';
 import { Point, InfluxDB } from '@influxdata/influxdb-client';
 
 @Injectable()

@@ -1,9 +1,4 @@
-import {
-  DynamicModule,
-  FactoryProvider,
-  Module,
-  Provider,
-} from '@nestjs/common';
+import { DynamicModule, FactoryProvider, Module } from '@nestjs/common';
 import { EarthquakeController } from './earthquake.controller';
 import { HttpModule } from '@nestjs/axios';
 import { EarthquakeService } from './earthquake.service';
