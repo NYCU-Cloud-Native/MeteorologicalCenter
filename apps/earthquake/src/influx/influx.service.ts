@@ -1,23 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IPoint } from 'influx';
 import { INFLUXDB_CLIENT_TOKEN, InfluxModule } from './influx.module';
-import { Point,InfluxDB } from '@influxdata/influxdb-client';
+import { Point, InfluxDB } from '@influxdata/influxdb-client';
 
 @Injectable()
 export class InfluxService {
-
-constructor(
+  constructor(
     @Inject('INFLUXDB_CLIENT_TOKEN')
-        private readonly influxclient: InfluxDB,
-    ) {}
+    private readonly influxclient: InfluxDB,
+  ) {}
 
-    public async writeRecord(a: string, data: Point){
-        await this.influxclient.getWriteApi(process.env.INFLUX_ORG,process.env.INFLUX_BUCKET,'s').writePoint(data);
-    }
-
-    // public async getQ(a: string){
-
-    // }
-
+  public async writeRecord(data: Point) {
+    await this.influxclient
+      .getWriteApi(process.env.INFLUX_ORG, process.env.INFLUX_BUCKET, 's')
+      .writePoint(data);
+  }
 }
-
