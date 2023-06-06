@@ -6,7 +6,6 @@ import {
 } from '@nestjs/common';
 import { EarthquakeController } from './earthquake.controller';
 import { HttpModule } from '@nestjs/axios';
-import { Earthquake } from './entites/earthquake.entity';
 import { EarthquakeService } from './earthquake.service';
 import { InfluxModule, InfluxModuleConfig } from 'src/influx/influx.module';
 import { ConfigService } from '@nestjs/config';
