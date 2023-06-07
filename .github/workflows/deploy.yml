@@ -5,7 +5,7 @@ on:
         type: string
         required: true
     secrets:
-      GITHUB_TOKEN:
+      DEPLOY_GITHUB_TOKEN:
         required: true
 
 jobs:
@@ -27,4 +27,4 @@ jobs:
           directory: manifest
           force: true
           tags: true
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.DEPLOY_GITHUB_TOKEN }}
