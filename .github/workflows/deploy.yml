@@ -13,18 +13,18 @@ jobs:
     name: Trigger Deploy
     runs-on: ubuntu-latest
     steps:
-      - run: git clone https://github.com/NYCU-Cloud-Native/manifest.git
-      - run: cd
+      - uses: actions/checkout@v3
+        with:
+          repository: "NYCU-Cloud-Native/MeteorologicalCenter"
       - name: Add tag
         run: |
-          cd manifest
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
+          echo tag name: $GITHUB_INPUT_TAG_NAME
           git tag $GITHUB_INPUT_TAG_NAME
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
           directory: manifest
-          force: true
           tags: true
           github_token: ${{ secrets.DEPLOY_GITHUB_TOKEN }}
