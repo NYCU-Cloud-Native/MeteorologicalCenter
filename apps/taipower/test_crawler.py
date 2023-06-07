@@ -22,7 +22,7 @@ class MockResponse:
     def _generate_200(self):
         self.status_code = 200
         
-        with open('app/taipower/test/001.csv', 'rb') as f:
+        with open('apps/taipower/test/001.csv', 'rb') as f:
             self.text = f.read().decode('utf8')
 
     def _generate_400(self):
