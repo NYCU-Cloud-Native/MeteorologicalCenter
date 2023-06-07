@@ -32,7 +32,7 @@ class CrawlerServicer(crawler_pb2_grpc.CrawlerServicer):
         # Create the write API
         write_api = client.write_api(write_options=SYNCHRONOUS)
 
-        data, timestamp = self._data_parser(self.data_url)
+        values, timestamp = self._data_parser(self.data_url)
 
         for value in values:
             query = self._generate_query(value, values[value], timestamp)
