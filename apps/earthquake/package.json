@@ -31,6 +31,7 @@
     "@nestjs/microservices": "^9.4.2",
     "@nestjs/platform-express": "^9.4.2",
     "axios": "^1.4.0",
+    "date-and-time": "^3.0.0",
     "dotenv": "^16.1.4",
     "influx": "^5.9.3",
     "mysql2": "^3.3.3",

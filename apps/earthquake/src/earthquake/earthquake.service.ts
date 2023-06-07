@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InfluxService } from '../influx/influx.service';
 import { Point } from '@influxdata/influxdb-client';
+import { addHours, parse } from 'date-and-time';
 
 @Injectable()
 export class EarthquakeService {
@@ -11,13 +12,9 @@ export class EarthquakeService {
     MagnitudeValue: number,
     OriginTime: string,
   ): Promise<void> {
-    const [date, times] = OriginTime.split(' ');
-    const [year, month, day] = date.split('-');
-    const [hour, min, sec] = times.split(':');
-    const d = new Date();
-    d.toUTCString();
-    const RegulerTime = new Date(
-      new Date(+year, +month - 1, +day, +hour, +min, +sec).toUTCString(),
+    const RegulerTime = parse(
+      `${OriginTime} GMT+0800`,
+      'YYYY-MM-DD HH:mm:ss [GMT]Z',
     );
     console.log(RegulerTime);
 

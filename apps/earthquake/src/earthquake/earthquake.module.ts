@@ -22,9 +22,8 @@ export const EARTHQUAKE_MODULE_OPTIONS_TOKEN =
     HttpModule,
     InfluxModule.forRoot({
       url: process.env.INFLUX_URL,
-      token: process.env.INFLUX_TOKEN,
-      database: process.env.INFLUX_DATABASE,
-      org: process.env.INFLUX_ORG,
+      token: process.env.DB_TOKEN,
+      org: process.env.DB_ORG,
     }),
   ],
   controllers: [EarthquakeController],
@@ -39,9 +38,8 @@ export class EarthquakeModule {
         HttpModule,
         InfluxModule.forRoot({
           url: process.env.INFLUX_URL,
-          token: process.env.INFLUX_TOKEN,
-          database: process.env.INFLUX_DATABASE,
-          org: process.env.INFLUX_ORG,
+          token: process.env.DB_TOKEN,
+          org: process.env.DB_ORG,
         }),
       ],
       providers: [
@@ -53,16 +51,3 @@ export class EarthquakeModule {
     };
   }
 }
-
-// public static
-
-//   forRootAsync(provider: EarthquakeModuleProvider) : DynamicModule{
-//     //
-//     // return {
-//     //   module: EarthquakeModule,
-//     //   imports: [HttpModule,InfluxModule.forRoot(provider.useFactory(provider.inject[0]))],
-//     //   controllers: [EarthquakeController],
-//     //   providers: [EarthquakeService],
-//     //   exports: [EarthquakeService],
-//     // };}
-// }

@@ -5,7 +5,6 @@ import { InfluxDB } from '@influxdata/influxdb-client';
 export interface InfluxModuleConfig {
   url: string;
   token: string;
-  database: string;
   org: string;
 }
 

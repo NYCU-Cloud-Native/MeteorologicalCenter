@@ -10,7 +10,7 @@ export class InfluxService {
 
   public async writeRecord(data: Point) {
     await this.influxclient
-      .getWriteApi(process.env.INFLUX_ORG, process.env.INFLUX_BUCKET, 's')
+      .getWriteApi(process.env.DB_ORG, process.env.INFLUX_BUCKET, 's')
       .writePoint(data);
   }
 }
