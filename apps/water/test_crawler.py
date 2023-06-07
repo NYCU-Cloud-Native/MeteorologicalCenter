@@ -57,7 +57,7 @@ class ReservoirDataTestCase(unittest.TestCase):
     def test_close_influxdb_client(self):
         # Create a mock instance of InfluxDBClient
         self.client.close()
-
+        
     def tearDown(self):
         # Clean up resources after the tests
         pass

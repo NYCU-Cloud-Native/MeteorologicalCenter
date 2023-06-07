@@ -39,7 +39,7 @@ class CrawlerServicer(crawler_pb2_grpc.CrawlerServicer):
             for i in range(len(reader)):
                 try:
                     next_row = reader[i+1]
-                    # if next data is not the same reservoir
+                    # if next data is not the same reservoir.
                     if reader[i][10] != next_row[10]:
                         
                         # Create a data point
