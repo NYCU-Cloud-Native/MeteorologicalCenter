@@ -1,0 +1,30 @@
+on:
+  workflow_call:
+    inputs:
+      tag_name:
+        type: string
+        required: true
+    secrets:
+      GITHUB_TOKEN:
+        required: true
+
+jobs:
+  trigger-deploy:
+    name: Trigger Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - run: git clone https://github.com/NYCU-Cloud-Native/manifest.git
+      - run: cd
+      - name: Add tag
+        run: |
+          cd manifest
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git tag $GITHUB_INPUT_TAG_NAME
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          directory: manifest
+          force: true
+          tags: true
+          github_token: ${{ secrets.GITHUB_TOKEN }}

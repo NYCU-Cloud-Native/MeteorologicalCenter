@@ -84,6 +84,7 @@ jobs:
       - run: pnpm lint
 
   controller-build-and-push-harbor:
+    needs: controller-test
     uses: ./.github/workflows/harbor.yml
     with:
       image_name: controller
@@ -93,6 +94,7 @@ jobs:
       HARBOR_TOKEN: ${{ secrets.HARBOR_TOKEN }}
 
   taipower-crawler-build-and-push-harbor:
+    needs: taipower-crawler-test
     uses: ./.github/workflows/harbor.yml
     with:
       image_name: taipower-crawler
@@ -102,6 +104,7 @@ jobs:
       HARBOR_TOKEN: ${{ secrets.HARBOR_TOKEN }}
 
   earthquake-crawler-build-and-push-harbor:
+    needs: earthquake-crawler-test
     uses: ./.github/workflows/harbor.yml
     with:
       image_name: earthquake-crawler
@@ -111,6 +114,7 @@ jobs:
       HARBOR_TOKEN: ${{ secrets.HARBOR_TOKEN }}
 
   water-crawler-build-and-push-harbor:
+    needs: water-crawler-test
     uses: ./.github/workflows/harbor.yml
     with:
       image_name: water-crawler
@@ -118,3 +122,11 @@ jobs:
     secrets:
       HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
       HARBOR_TOKEN: ${{ secrets.HARBOR_TOKEN }}
+
+  controller-deploy:
+    needs: controller-build-and-push-harbor
+    uses: ./.github/workflows/deploy.yml
+    with:
+      tag_name: ${{ github.ref_name }}
+    secrets:
+      GITHUB_TOKEN: ${{ secrets.DEPLOY_GITHUB_TOKEN }}
