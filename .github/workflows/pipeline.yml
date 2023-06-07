@@ -130,3 +130,27 @@ jobs:
       tag_name: ${{ github.ref_name }}
     secrets:
       DEPLOY_GITHUB_TOKEN: ${{ secrets.DEPLOY_GITHUB_TOKEN }}
+
+  taipower-crawler-deploy:
+    needs: taipower-crawler-build-and-push-harbor
+    uses: ./.github/workflows/deploy.yml
+    with:
+      tag_name: ${{ github.ref_name }}
+    secrets:
+      DEPLOY_GITHUB_TOKEN: ${{ secrets.DEPLOY_GITHUB_TOKEN }}
+
+  earthquake-crawler-deploy:
+    needs: earthquake-crawler-build-and-push-harbor
+    uses: ./.github/workflows/deploy.yml
+    with:
+      tag_name: ${{ github.ref_name }}
+    secrets:
+      DEPLOY_GITHUB_TOKEN: ${{ secrets.DEPLOY_GITHUB_TOKEN }}
+
+  water-crawler-deploy:
+    needs: water-crawler-build-and-push-harbor
+    uses: ./.github/workflows/deploy.yml
+    with:
+      tag_name: ${{ github.ref_name }}
+    secrets:
+      DEPLOY_GITHUB_TOKEN: ${{ secrets.DEPLOY_GITHUB_TOKEN }}
