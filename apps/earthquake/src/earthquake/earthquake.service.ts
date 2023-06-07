@@ -14,16 +14,11 @@ export class EarthquakeService {
     const [date, times] = OriginTime.split(' ');
     const [year, month, day] = date.split('-');
     const [hour, min, sec] = times.split(':');
-    let d = new Date();
-    d.toUTCString()
-    const RegulerTime = new Date(new Date(
-      +year,
-      +month - 1,
-      +day,
-      +hour,
-      +min,
-      +sec,
-    ).toUTCString());
+    const d = new Date();
+    d.toUTCString();
+    const RegulerTime = new Date(
+      new Date(+year, +month - 1, +day, +hour, +min, +sec).toUTCString(),
+    );
     console.log(RegulerTime);
 
     const point = new Point('earthquake')
