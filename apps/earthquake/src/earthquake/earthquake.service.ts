@@ -11,10 +11,14 @@ export class EarthquakeService {
     MagnitudeValue: number,
     OriginTime: string,
   ): Promise<void> {
-    const [date,times] = OriginTime.split(' ')
-    const [year,month,day] = date.split('-')
-    const [hour,min,sec] = times.split(':')
-    const RegulerTime = new Date(+year, +month-1, + day,+hour+8,+min,+sec)
+    const [date, times] = OriginTime.split(' ');
+    const [year, month, day] = date.split('-');
+    const [hour, min, sec] = times.split(':');
+    const d = new Date();
+    d.toUTCString();
+    const RegulerTime = new Date(
+      new Date(+year, +month - 1, +day, +hour, +min, +sec).toUTCString(),
+    );
     console.log(RegulerTime);
 
     const point = new Point('earthquake')

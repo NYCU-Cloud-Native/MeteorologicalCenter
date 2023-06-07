@@ -14,9 +14,9 @@
     "lint-staged": "^13.2.2"
   },
   "lint-staged": {
-    "apps/earthquake/**/*.{ts,vue}": [
-      "prettier --write --config \"./apps/earthquake/.prettierrc\" \"src/**/*.ts\" \"test/**/*.ts\" ",
-      "eslint \"{src,apps,libs,test}/**/*.ts\" --fix -c \"./apps/earthquake/.eslintrc.js\""
+    "apps/earthquake/**/*.ts": [
+      "prettier --write --config \"./apps/earthquake/.prettierrc\" \"apps/earthquake/src/**/*.ts\" \"apps/earthquake/test/**/*.ts\" ",
+      "eslint \"apps/earthquake/{src,apps,libs,test}/**/*.ts\" --fix -c \"./apps/earthquake/.eslintrc.js\""
     ]
   }
 }
