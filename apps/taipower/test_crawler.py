@@ -3,6 +3,7 @@ import requests
 
 from server import CrawlerServicer
 
+# Mock Response to overwrite requests
 class MockResponse:
 
     def __init__(self, status):
