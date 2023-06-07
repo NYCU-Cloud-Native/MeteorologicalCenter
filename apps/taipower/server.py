@@ -10,22 +10,59 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 import os
 
 class CrawlerServicer(crawler_pb2_grpc.CrawlerServicer):
+
+    def __init__(self):
+        self.url = os.getenv('DB_URL')
+        self.token = os.getenv('DB_TOKEN')
+        self.bucket = os.getenv('DB_BUCKET')
+        self.org = os.getenv('DB_ORG')
+        self.data_url = os.getenv('DATA_URL')
+
     def Run(self, request, context):
         load_dotenv()
 
-        url = os.getenv('DB_URL')
-        token = os.getenv('DB_TOKEN')
-        org = os.getenv('DB_ORG')
-        bucket = os.getenv('DB_BUCKET')
-        data_url = os.getenv('DATA_URL')
+        self.url = os.getenv('DB_URL')
+        self.token = os.getenv('DB_TOKEN')
+        self.bucket = os.getenv('DB_BUCKET')
+        self.org = os.getenv('DB_ORG')
+        self.data_url = os.getenv('DATA_URL')
         # Create InfluxDB client
-        client = InfluxDBClient(url=url, token=token, org=org)
+        client = InfluxDBClient(url=self.url, token=self.token, org=self.org)
 
         # Create the write API
         write_api = client.write_api(write_options=SYNCHRONOUS)
 
+        data, timestamp = self._data_parser(self.data_url)
+
+        for value in values:
+            query = self._generate_query(value, values[value], timestamp)
+            write_api.write(bucket=self.bucket, org=self.org, record=[query])
+
+        # Close the InfluxDB client
+        client.close()
+        print("Data successfully written to InfluxDB")
+        print(crawler_pb2.Response())
+        return crawler_pb2.Response()
+
+    def _generate_query(self, location, value, timestamp):
+        point = Point(self.bucket)
+        point.tag("location", location)
+        
+        try:
+            point.field("value", float(value))
+        except ValueError as e:
+            print(f"ERROR: {e}")
+            return None
+
+        point.time(datetime.strptime(timestamp, "%Y-%m-%d %H:%M").isoformat())
+        return point
+
+    def _data_parser(self, url):
+
         # Fetch data from URL
-        response = requests.get(data_url)
+        response = requests.get(url)
+        values = {}
+        timestamp = None
 
         if response.status_code == 200:    
             reader = response.text.split('\r\n')[1:-1]
@@ -40,23 +77,8 @@ class CrawlerServicer(crawler_pb2_grpc.CrawlerServicer):
                     values.update({
                         loc: row[i+1]
                     })
-                
-                print(values)
 
-                # Create a data point        
-                for value in values:
-                    point = Point("power_measurement")
-                    point.tag("location", value)
-                    point.field("_value", float(values[value]))
-                    point.time(datetime.strptime(timestamp, "%Y-%m-%d %H:%M").isoformat())
-                    print(point)
-                    write_api.write(bucket=bucket, org=org, record=[point])
-
-                # Close the InfluxDB client
-                client.close()
-                print("Data successfully written to InfluxDB")
-                print(crawler_pb2.Response())
-                return crawler_pb2.Response()
+        return values, timestamp
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))

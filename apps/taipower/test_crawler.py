@@ -1,101 +1,66 @@
 import pytest
-import grpc
-import threading
-import crawler_pb2
-import crawler_pb2_grpc
 import requests
-from datetime import datetime
-from dotenv import load_dotenv
-from influxdb_client import InfluxDBClient, Point, WritePrecision
-from influxdb_client.client.write_api import SYNCHRONOUS
-import os
 
-from server import serve
+from server import CrawlerServicer
 
-# Define the test data for mocking the environment variables
-mock_env_data = {
-    'DB_URL': os.getenv('TEST_DB_URL'),
-    'DB_TOKEN': os.getenv('TEST_DB_TOKEN'),
-    'DB_ORG': os.getenv('TEST_DB_ORG'),
-    'DB_BUCKET': os.getenv('TEST_DB_BUCKET'),
-    'DATA_URL': os.getenv('TEST_DATA_URL')
-}
+class MockResponse:
 
+    def __init__(self, status):
 
-class MockCrawlerServicer(crawler_pb2_grpc.CrawlerServicer):
-    def Run(self, request, context):
-        # Mock the environment variables
-        os.getenv = lambda name: mock_env_data[name]
+        self.status_code = 0
+        self.text = ''
 
-        # Mock the requests.get() method
-        class MockResponse:
-            def __init__(self, status_code, text):
-                self.status_code = status_code
-                self.text = text
+        if status == 200:
+            self._generate_200()
 
-        def mock_get(url):
-            return MockResponse(200, '2023-06-06 12:00,1,2,3,4,5,6,7,8')
+        if status == 400:
+            self._generate_400()
 
-        requests.get = mock_get
+        if status == 500:
+            self._generate_500()
 
-        # Mock the InfluxDB client
-        class MockInfluxDBClient:
-            def __init__(self, url, token, org):
-                pass
+    def _generate_200(self):
+        self.status_code = 200
+        
+        with open('./test/001.csv', 'rb') as f:
+            self.text = f.read().decode('utf8')
 
-            def write_api(self, write_options):
-                return MockWriteApi()
+    def _generate_400(self):
+        self.status_code = 404
+        self.text = '{msg: not found}'
 
-            def close(self):
-                pass
+def test_get_url_success(mocker):
 
-        class MockWriteApi:
-            def write(self, bucket, org, record):
-                pass
+    service = CrawlerServicer()
 
-        class MockPoint:
-            def __init__(self, measurement):
-                pass
+    mocker.patch("requests.get", return_value=MockResponse(200))
 
-            def tag(self, key, value):
-                pass
+    result, timestamp = service._data_parser("https://data.taipower.com.tw/opendata/apply/file/d006019/001.csv")
 
-            def field(self, key, value):
-                pass
+    print(result, timestamp)
 
-            def time(self, time):
-                pass
+    assert result == {'North Generate': '1019.8', 'North Consumption': '1312.4', 'Central Generate': '904.7', 'Central Consumption': '961.1', 'South Generate': '1576.2', 'South Consumption': '1193.5', 'East Generate': '14.2', 'East Consumption': '47.9'}
+    assert timestamp == '2023-06-07 12:50'
 
-        # Replace the original classes with the mock classes
-        global InfluxDBClient, Point
-        InfluxDBClient = MockInfluxDBClient
-        Point = MockPoint
+def test_get_url_failed(mocker):
 
-        # Run the gRPC method
-        servicer = CrawlerServicer()
-        response = servicer.Run(None, None)
+    service = CrawlerServicer()
 
-        # Assert the response
-        assert isinstance(response, crawler_pb2.Response)
+    mocker.patch("requests.get", return_value=MockResponse(400))
 
-# Pytest function to test the gRPC server
+    result, timestamp = service._data_parser("https://data.taipower.com.tw/opendata/apply/file/d006019/001.csv")
 
+    assert result == {}
+    assert timestamp == None
 
-def test_grpc_server():
-    # Start the gRPC server in a separate thread
-    server_thread = threading.Thread(target=serve)
-    server_thread.start()
+def test_generate_query(mocker):
 
-    # Create a gRPC channel and stub
-    channel = grpc.insecure_channel('127.0.0.1:50051')
-    stub = crawler_pb2_grpc.CrawlerStub(channel)
+    service = CrawlerServicer()
 
-    # Call the gRPC method
-    response = stub.Run(crawler_pb2.Request())
+    timestamp = '2023-06-07 12:50'
+    location = 'North Generate'
+    value = 35.2
 
-    # Assert the response
-    assert isinstance(response, crawler_pb2.Response)
+    result = service._generate_query(location, value, timestamp)
 
-    # Stop the gRPC server
-    channel.close()
-    server_thread.join()
+    assert str(result) == 'None,location=North\\ Generate value=35.2 1686142200000000000'
