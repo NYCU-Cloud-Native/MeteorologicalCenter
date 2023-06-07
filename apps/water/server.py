@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import grpc
 from concurrent import futures
 import crawler_pb2
@@ -38,9 +39,9 @@ class CrawlerServicer(crawler_pb2_grpc.CrawlerServicer):
             for i in range(len(reader)):
                 try:
                     next_row = reader[i+1]
-
+                    # if next data is not the same reservoir
                     if reader[i][10] != next_row[10]:
-                        print(reader[i])
+                        
                         # Create a data point
                         data_point = Point("reservoir-4") \
                             .field("CatchmentAreaRainfall", reader[i][0]) \
@@ -63,7 +64,7 @@ class CrawlerServicer(crawler_pb2_grpc.CrawlerServicer):
 
                         write_api.write(bucket=bucket, org=org, record=[data_point])
                 except :
-                    print(reader[i])
+                    # the last data of the reservoir
                     data_point = Point("reservoir-3") \
                         .field("CatchmentAreaRainfall", reader[i][0]) \
                         .field("DesiltingTunnelOutflow", reader[i][1]) \

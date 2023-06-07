@@ -35,6 +35,7 @@ if response.status_code == 200:
             next_row = reader[i+1]
 
             if reader[i][10] != next_row[10]:
+                # if the next data is not the same reservoir
                 print(reader[i])
                 # Create a data point
                 data_point = Point("reservoir-4") \
@@ -58,6 +59,7 @@ if response.status_code == 200:
 
                 write_api.write(bucket=bucket, org=org, record=[data_point])
         except :
+            # the last data of the reservoir
             print(reader[i])
             data_point = Point("reservoir-3") \
                 .field("CatchmentAreaRainfall", reader[i][0]) \

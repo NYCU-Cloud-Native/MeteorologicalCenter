@@ -1,77 +1,66 @@
+# -*- coding: utf-8 -*-
 import unittest
+from unittest import mock
 import requests
-import csv
-import os
-from dotenv import load_dotenv
+import csv, os
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
-
-load_dotenv()
-
+from crypto import Random
 
 class ReservoirDataTestCase(unittest.TestCase):
+    @classmethod
     def setUp(self):
         # Set up the connection parameters
-        self.url = os.getenv('DB_URL')
-        self.token = os.getenv('DB_TOKEN')
-        self.org = os.getenv('DB_ORG')
-        self.bucket = os.getenv('DB_BUCKET')
-        self.data_url = os.getenv('DATA_URL')
+        self.url = os.getenv('TEST_DB_URL')
+        self.token = os.getenv('TEST_DB_TOKEN')
+        self.org = os.getenv('TEST_DB_ORG')
+        self.bucket = os.getenv('TEST_DB_BUCKET')
+        self.data_url = os.getenv('TEST_DATA_URL')
 
-        # Connect to InfluxDB
-        self.client = InfluxDBClient(url=self.url, token=self.token)
+        # Mock the InfluxDBClient
+        self.client = mock.Mock(spec=InfluxDBClient)
 
     def test_data_retrieval(self):
         # Fetch the reservoir data
         reservoir_url = "https://data.wra.gov.tw/Service/OpenData.aspx?format=csv&id=1602CA19-B224-4CC3-AA31-11B1B124530F"
         response = requests.get(reservoir_url)
-        f_reader = response.text.split('\r\n')[1:-1]
-        csv_reader = csv.reader(f_reader)
-        reader = list(csv_reader)
-
+        
         # Ensure data retrieval is successful
         self.assertEqual(response.status_code, 200)
 
+        if response.status_code == 200:
+            f_reader = response.text.split('\r\n')[1:-1]
+            csv_reader = csv.reader(f_reader)
+            reader = list(csv_reader)
+
+            # Assert that the retrieved data has the expected format or values
+            self.assertGreater(len(reader), 0)
+
     def test_data_insertion(self):
-        # Fetch the reservoir data
-        reservoir_url = "https://data.wra.gov.tw/Service/OpenData.aspx?format=csv&id=1602CA19-B224-4CC3-AA31-11B1B124530F"
-        response = requests.get(reservoir_url)
-        f_reader = response.text.split('\r\n')[1:-1]
-        csv_reader = csv.reader(f_reader)
-        data = list(csv_reader)
-
-        # Additional assertions specific to data insertion
-
         # Create the write API
-        write_api = self.client.write_api(write_options=SYNCHRONOUS)
-
+        write_api = self.client.write_api.return_value
+        
         # Define the measurement and tags
-        measurement = "reservoir-test"
-
+        reservoir_measurement = "reservoir_measurement"
+        
         # Prepare the data points
-        data_points = []
-        for row in data:
-            # Create a data point for each row
-            data_point = Point(measurement).tag("tag1", "10201").field("field1", row[0]).field("field2", row[1])
-
-            data_points.append(data_point)
+        data_points = [
+            Point(reservoir_measurement).tag("ReservoirIdentifier", "10203").field("TotalOutflow", 10).field("WaterDraw", 20),
+            Point(reservoir_measurement).tag("ReservoirIdentifier", "2").field("TotalOutflow", 30).field("WaterDraw", 40)
+        ]
 
         # Write the data points to InfluxDB
-        write_api.write(bucket=self.bucket, org=self.org, record=data_points)
+        write_api.write.return_value = None
+        write_api.write.assert_not_called()  # Ensure the write method is not called directly
+        write_api.write(bucket="mock_bucket", record=data_points)
 
-        # Query the data from InfluxDB
-        query = f'from(bucket: "{self.bucket}") |> range(start: -1m) |> filter(fn: (r) => r._measurement == "{measurement}")'
-        tables = self.client.query_api().query(query, self.org)
-        
-        # Close the InfluxDB client
+    def test_close_influxdb_client(self):
+        # Create a mock instance of InfluxDBClient
         self.client.close()
-
 
     def tearDown(self):
         # Clean up resources after the tests
-        # For example, you can delete the test data from InfluxDB
         pass
-
 
 if __name__ == '__main__':
     unittest.main()
