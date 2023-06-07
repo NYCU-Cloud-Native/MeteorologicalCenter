@@ -49,7 +49,7 @@ describe('EarthquakeService', () => {
         new Point('earthquake')
           .tag('Epicenter', parameter.Epicenter)
           .floatField('MagnitudeValue', parameter.MagnitudeValue)
-          .timestamp(new Date('2023-05-13T01:30:20.000Z')),
+          .timestamp(new Date('2023-05-12T17:30:20.000Z')),
       );
     });
   });

@@ -6,8 +6,7 @@ export interface InfluxModuleConfig {
   url: string;
   token: string;
   database: string;
-  username: string;
-  password: string;
+  org: string;
 }
 
 export const INFLUXDB_CLIENT_TOKEN = '';

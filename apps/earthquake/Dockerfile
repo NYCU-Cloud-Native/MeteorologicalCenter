@@ -2,6 +2,11 @@ FROM node:18.16-alpine3.18 AS Build
 
 WORKDIR /app
 
+RUN apk update && apk add protobuf \
+    python3 \
+    make \ 
+    g++
+
 COPY . .
 
 RUN npm i -g pnpm
@@ -19,6 +24,7 @@ WORKDIR /app
 COPY --from=Build --chown=node:node /app/node_modules ./node_modules
 COPY --from=Build --chown=node:node /app/apps/earthquake/node_modules ./apps/earthquake/node_modules
 COPY --from=Build --chown=node:node /app/apps/earthquake/dist ./apps/earthquake//dist
+COPY --chown=node:node apps/controller/proto  ./apps/controller/proto
 
 WORKDIR /app/apps/earthquake
 
