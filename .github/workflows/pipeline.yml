@@ -1,0 +1,94 @@
+on:
+  push:
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  controller-test:
+    name: Build and test controller
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install latest version protoc
+        uses: arduino/setup-protoc@v1
+      - name: Install code coverage tool
+        uses: taiki-e/install-action@cargo-llvm-cov
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Run tests and collect coverage
+        run: cargo llvm-cov --all-features -v
+
+  taipower-crawler-test:
+    name: Test Taipower crawler
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install latest version protoc
+        uses: arduino/setup-protoc@v1
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: "**/requirements.txt"
+      - run: pip install -r apps/taipower/requirements.txt
+      - run: pip install pytest
+      - run: pytest apps/taipower
+
+  earthquake-crawler-test:
+    name: Test earthquake crawler
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install latest version protoc
+        uses: arduino/setup-protoc@v1
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Set node version to 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "pnpm"
+      - run: pnpm i
+      - run: pnpm -F tsmc_earthquake test
+      - run: pnpm lint
+
+  controller-build-and-push-harbor:
+    uses: ./.github/workflows/harbor.yml
+    with:
+      image_name: controller
+      dockerfile: apps/controller/Dockerfile
+    secrets:
+      HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+      HARBOR_TOKEN: ${{ secrets.HARBOR_TOKEN }}
+
+  taipower-crawler-build-and-push-harbor:
+    uses: ./.github/workflows/harbor.yml
+    with:
+      image_name: taipower-crawler
+      dockerfile: apps/taipower/Dockerfile
+    secrets:
+      HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+      HARBOR_TOKEN: ${{ secrets.HARBOR_TOKEN }}
+
+  earthquake-crawler-build-and-push-harbor:
+    uses: ./.github/workflows/harbor.yml
+    with:
+      image_name: earthquake-crawler
+      dockerfile: apps/earthquake/Dockerfile
+    secrets:
+      HARBOR_USERNAME: ${{ secrets.HARBOR_USERNAME }}
+      HARBOR_TOKEN: ${{ secrets.HARBOR_TOKEN }}

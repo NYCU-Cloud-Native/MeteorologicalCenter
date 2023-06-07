@@ -5,7 +5,10 @@ pub async fn run_task(endpoints: &Vec<String>) -> Result<(), Box<dyn Error + Sen
     for endpoint in endpoints {
         let mut client = CrawlerClient::connect(endpoint.clone()).await?;
         let request = tonic::Request::new(Request {});
-        client.run(request).await?;
+        match client.run(request).await {
+            Ok(_) => println!("triggered {}", endpoint),
+            Err(e) => eprintln!("trigger {} failed: {}", endpoint, e),
+        }
     }
     println!("task runned");
     Ok(())
