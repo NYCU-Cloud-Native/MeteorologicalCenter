@@ -25,6 +25,5 @@ jobs:
       - name: Push changes
         uses: ad-m/github-push-action@master
         with:
-          directory: manifest
           tags: true
           github_token: ${{ secrets.DEPLOY_GITHUB_TOKEN }}
