@@ -34,7 +34,7 @@ describe('EarthquakeService', () => {
       const parameter = {
         Epicenter: 'Tainan',
         MagnitudeValue: 3.0,
-        OriginTime: new Date('Sat May 13 2023 01:30:20 GMT+0800'),
+        OriginTime: '2023-05-13 01:30:20',
       };
 
       jest.spyOn(influxService, 'writeRecord').mockImplementation(() => result);
@@ -49,7 +49,7 @@ describe('EarthquakeService', () => {
         new Point('earthquake')
           .tag('Epicenter', parameter.Epicenter)
           .floatField('MagnitudeValue', parameter.MagnitudeValue)
-          .timestamp(parameter.OriginTime),
+          .timestamp(new Date('2023-05-13T01:30:20.000Z')),
       );
     });
   });

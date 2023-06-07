@@ -31,11 +31,6 @@ export class EarthquakeController {
       data.records.Earthquake[0].EarthquakeInfo.EarthquakeMagnitude
         .MagnitudeValue,
     );
-    console.log(
-      new Date(
-        Date.parse(data.records.Earthquake[0].EarthquakeInfo.OriginTime),
-      ),
-    );
 
     return;
   }

@@ -13,7 +13,7 @@ async function bootstrap() {
       transport: Transport.GRPC,
       options: {
         package: 'crawler',
-        protoPath: join(__dirname, '../../controller/proto/crawler.proto'),
+        protoPath: join(__dirname, '../crawler.proto'),
       },
     },
   );
