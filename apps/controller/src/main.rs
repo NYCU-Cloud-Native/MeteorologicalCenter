@@ -16,7 +16,10 @@ fn extract_endpoints_from_envs<T: Iterator<Item = (String, String)>>(envs: T) ->
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    dotenvy::dotenv().unwrap();
+    match dotenvy::dotenv() {
+        Ok(_) => println!("Env file found and loaded"),
+        Err(_) => println!("No env file found, ignored"),
+    };
     let endpoints = extract_endpoints_from_envs(env::vars());
     let endpoints_bak = endpoints.clone();
     tokio::spawn(async move {

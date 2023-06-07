@@ -3,3 +3,5 @@
 
 pnpm lerna run lint-staged
 pnpm test
+pnpm lint
+pnpm format
