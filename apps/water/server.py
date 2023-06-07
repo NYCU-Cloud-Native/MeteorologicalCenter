@@ -11,6 +11,27 @@ from influxdb_client.client.write_api import SYNCHRONOUS
 import os, csv
 
 class CrawlerServicer(crawler_pb2_grpc.CrawlerServicer):
+    
+    def insert_influxdb(reader):
+        data_point = Point("reservoir-3") \
+            .field("CatchmentAreaRainfall", reader[0]) \
+            .field("DesiltingTunnelOutflow", reader[1]) \
+            .field("DrainageTunnelOutflow", reader[2]) \
+            .field("EffectiveWaterStorageCapacity", reader[3]) \
+            .field("InflowDischarge", reader[4]) \
+            .field("ObservationTime", reader[5]) \
+            .field("OthersOutflow", reader[6]) \
+            .field("PowerOutletOutflow", reader[7]) \
+            .field("PredeterminedCrossFlow", reader[8]) \
+            .field("PredeterminedOutflowTime", reader[9]) \
+            .tag("ReservoirIdentifier", reader[10])\
+            .field("SpillwayOutflow", reader[11]) \
+            .field("StatusType", reader[12]) \
+            .field("TotalOutflow", reader[13]) \
+            .field("WaterDraw", reader[14]) \
+            .field("WaterLevel", reader[15]) 
+        return data_point
+
     def Run(self, request, context):
         load_dotenv()
 
@@ -41,47 +62,14 @@ class CrawlerServicer(crawler_pb2_grpc.CrawlerServicer):
                     next_row = reader[i+1]
                     # if next data is not the same reservoir.
                     if reader[i][10] != next_row[10]:
-                        
                         # Create a data point
-                        data_point = Point("reservoir-4") \
-                            .field("CatchmentAreaRainfall", reader[i][0]) \
-                            .field("DesiltingTunnelOutflow", reader[i][1]) \
-                            .field("DrainageTunnelOutflow", reader[i][2]) \
-                            .field("EffectiveWaterStorageCapacity", reader[i][3]) \
-                            .field("InflowDischarge", reader[i][4]) \
-                            .field("ObservationTime", reader[i][5]) \
-                            .field("OthersOutflow", reader[i][6]) \
-                            .field("PowerOutletOutflow", reader[i][7]) \
-                            .field("PredeterminedCrossFlow", reader[i][8]) \
-                            .field("PredeterminedOutflowTime", reader[i][9]) \
-                            .tag("ReservoirIdentifier", reader[i][10])\
-                            .field("ReservoirName", name_table[reader[i][10]]) \
-                            .field("SpillwayOutflow", reader[i][11]) \
-                            .field("StatusType", reader[i][12]) \
-                            .field("TotalOutflow", reader[i][13]) \
-                            .field("WaterDraw", reader[i][14]) \
-                            .field("WaterLevel", reader[i][15]) 
+                        data_point = CrawlerServicer.insert_influxdb(reader[i])
 
                         write_api.write(bucket=bucket, org=org, record=[data_point])
                 except :
                     # the last data of the reservoir
-                    data_point = Point("reservoir-3") \
-                        .field("CatchmentAreaRainfall", reader[i][0]) \
-                        .field("DesiltingTunnelOutflow", reader[i][1]) \
-                        .field("DrainageTunnelOutflow", reader[i][2]) \
-                        .field("EffectiveWaterStorageCapacity", reader[i][3]) \
-                        .field("InflowDischarge", reader[i][4]) \
-                        .field("ObservationTime", reader[i][5]) \
-                        .field("OthersOutflow", reader[i][6]) \
-                        .field("PowerOutletOutflow", reader[i][7]) \
-                        .field("PredeterminedCrossFlow", reader[i][8]) \
-                        .field("PredeterminedOutflowTime", reader[i][9]) \
-                        .tag("ReservoirIdentifier", reader[i][10])\
-                        .field("SpillwayOutflow", reader[i][11]) \
-                        .field("StatusType", reader[i][12]) \
-                        .field("TotalOutflow", reader[i][13]) \
-                        .field("WaterDraw", reader[i][14]) \
-                        .field("WaterLevel", reader[i][15]) 
+                    # Create a data point
+                    data_point = CrawlerServicer.insert_influxdb(reader[i])
 
                     write_api.write(bucket=bucket, org=org, record=[data_point])
                     break

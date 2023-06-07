@@ -5,7 +5,6 @@ import requests
 import csv, os
 from influxdb_client import InfluxDBClient, Point
 from influxdb_client.client.write_api import SYNCHRONOUS
-from crypto import Random
 
 class ReservoirDataTestCase(unittest.TestCase):
     @classmethod
