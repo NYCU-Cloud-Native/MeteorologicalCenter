@@ -1,0 +1,4 @@
+load-dotenv==0.1.0
+requests==2.31.0
+grpcio-tools==1.54.2
+influxdb-client==1.36.1
