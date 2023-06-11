@@ -4,6 +4,7 @@ import crawler_pb2
 import crawler_pb2_grpc
 import requests
 from datetime import datetime
+import pytz
 from dotenv import load_dotenv
 from influxdb_client import InfluxDBClient, Point, WritePrecision
 from influxdb_client.client.write_api import SYNCHRONOUS
@@ -26,6 +27,7 @@ class CrawlerServicer(crawler_pb2_grpc.CrawlerServicer):
         self.bucket = os.getenv('DB_BUCKET')
         self.org = os.getenv('DB_ORG')
         self.data_url = os.getenv('DATA_URL')
+
         # Create InfluxDB client
         client = InfluxDBClient(url=self.url, token=self.token, org=self.org)
 
@@ -54,7 +56,9 @@ class CrawlerServicer(crawler_pb2_grpc.CrawlerServicer):
             print(f"ERROR: {e}")
             return None
 
-        point.time(datetime.strptime(timestamp, "%Y-%m-%d %H:%M").isoformat())
+        tp = pytz.timezone('Asia/Taipei')
+
+        point.time(datetime.strptime(timestamp, "%Y-%m-%d %H:%M").replace(tzinfo=tp).isoformat())
         return point
 
     def _data_parser(self, url):

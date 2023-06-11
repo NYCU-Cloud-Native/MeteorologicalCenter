@@ -64,4 +64,4 @@ def test_generate_query(mocker):
 
     result = service._generate_query(location, value, timestamp)
 
-    assert str(result) == 'None,location=North\\ Generate value=35.2 1686142200000000000'
+    assert str(result) == 'None,location=North\\ Generate value=35.2 1686113040000000000'
